@@ -1,26 +1,150 @@
 @import "tailwindcss";
 
+/* 🌍 Global Design Tokens */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 🎨 Colors */
+  --primary-main: #083455;
+  --primary-light: #0D436C;
+  --secondary-main: #FFD19C;
+  --secondary-light: #FFE0BC;
+  --accent-main: #804012;
+  --red-main: #731818;
+  --red-dark: #6C2E2E;
+
+  --text-main: #050505;
+  --text-secondary: #3A3A3A;
+  --text-disable: #5E5E5E;
+
+  --background: #FEFAEE;
+  --foreground: #050505;
+
+  /* 🔤 Fonts */
+  --font-primary: 'Playfair Display', serif;
+  --font-secondary: 'Source Sans 3', sans-serif;
+
+  /* 📏 Spacing */
+  --S6: 6px;
+  --S8: 8px;
+  --S16: 16px;
+  --S24: 24px;
+  --S32: 32px;
+  --S40: 40px;
+  --S48: 48px;
+  --S56: 56px;
+  --S64: 64px;
+
+  /* 🧭 Radii */
+  --R8: 8px;
+  --R16: 16px;
+  --R24: 24px;
+  --R32: 32px;
 }
 
+/* 🎨 Tailwind Inline Theme Mapping */
 @theme inline {
+  --color-primary-main: var(--primary-main);
+  --color-primary-light: var(--primary-light);
+  --color-secondary-main: var(--secondary-main);
+  --color-secondary-light: var(--secondary-light);
+  --color-accent-main: var(--accent-main);
+  --color-red-main: var(--red-main);
+  --color-red-dark: var(--red-dark);
+
+  --color-main: var(--text-main);
+  --color-secondary: var(--text-secondary);
+  --color-disable: var(--text-disable);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-primary: var(--font-primary);
+  --font-secondary: var(--font-secondary);
+
+  /* Spacing */
+  --spacing-s6: var(--S6);
+  --spacing-s8: var(--S8);
+  --spacing-s16: var(--S16);
+  --spacing-s24: var(--S24);
+  --spacing-s32: var(--S32);
+  --spacing-s40: var(--S40);
+  --spacing-s48: var(--S48);
+  --spacing-s56: var(--S56);
+  --spacing-s64: var(--S64);
+
+  /* Radii */
+  --radius-r8: var(--R8);
+  --radius-r16: var(--R16);
+  --radius-r24: var(--R24);
+  --radius-r32: var(--R32);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 🧠 Typography */
+.hero-h1 {
+  @apply font-bold;
+  font-family: var(--font-primary);
+  font-size: clamp(2.5rem, 3.333vw, 4rem);   /* 40px → 64px */
+  line-height: clamp(3.5rem, 1.167vw, 5rem); /* 56px → 80px */
 }
 
+.page-title-h2 {
+  @apply font-semibold;
+  font-family: var(--font-primary);
+  font-size: clamp(1.75rem, 2.5vw, 3rem);    /* 28px → 48px */
+  line-height: clamp(2.5rem, 3.333vw, 4rem); /* 40px → 64px */
+}
+
+.subheading-h3 {
+  @apply font-medium;
+  font-family: var(--font-primary);
+  font-size: clamp(1.5rem, 1.667vw, 2rem);   /* 24px → 32px */
+  line-height: clamp(2rem, 2.5vw, 3rem);     /* 32px → 48px */
+}
+
+.title-h4 {
+  @apply font-medium;
+  font-size: clamp(1.25rem, 1.25vw, 1.5rem); /* 20px → 24px */
+  line-height: clamp(1.75rem, 1.667vw, 2rem); /* 28px → 32px */
+}
+.body-large {
+  @apply font-normal;
+  font-size: clamp(1.25rem, 1.25vw, 1.5rem); /* 20px → 24px */
+  line-height: clamp(1.75rem, 1.667vw, 2rem); /* 28px → 32px */
+}
+
+.body-default {
+  @apply font-normal;
+  font-size: clamp(0.875rem, 1vw, 1.125rem); /* 14px → 18px */
+  line-height: clamp(1.25rem, 2vw, 1.75rem); /* 20px → 28px */
+}
+
+.body-small {
+  @apply font-normal;
+  font-size: clamp(0.75rem, 0.833vw, 0.875rem); /* 12px → 14px */
+  line-height: clamp(1.25rem, 1.5vw, 1.5rem);   /* 20px → 24px */
+}
+
+.caption {
+  @apply font-normal;
+  font-size: clamp(0.688rem, 0.625vw, 0.75rem); /* 11px → 12px */
+  line-height: clamp(0.875rem, 0.833vw, 1rem);  /* 14px → 16px */
+}
+
+/* 🌐 Global Body */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-secondary);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+/* placeholder text for empty contentEditable */
+[contenteditable]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+/* small tweak for right-side toolbar visuals (optional) */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
 }
