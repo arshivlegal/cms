@@ -246,7 +246,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
             }
           }}
           placeholder="e.g. civil-law"
-          className="w-full px-s16 py-s12 border border-gray-300 rounded-r8 focus:outline-none focus:border-accent-main"
+          className="w-full px-s16 py-s16 border border-gray-300 rounded-r8 focus:outline-none focus:border-accent-main"
         />
 
         {errors.tags && (

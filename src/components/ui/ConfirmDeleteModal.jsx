@@ -48,7 +48,7 @@ export default function ConfirmDeleteModal({
               <Button
                 onClick={onConfirm}
                 disabled={loading}
-               varient={"destructive"}
+               variant={"destructive"}
               >
                 {loading ? "Deleting..." : "Yes, Delete"}
               </Button>

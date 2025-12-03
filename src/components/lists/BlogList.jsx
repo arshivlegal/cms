@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "@/components/ui/Card";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
-
+import Button from "../ui/Button";
 export default function BlogList() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
