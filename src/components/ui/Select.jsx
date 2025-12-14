@@ -16,7 +16,7 @@ export default function Select({
 
   return (
     <div className="flex flex-col gap-s8 w-full">
-      {label && <label className="body-small">{label}</label>}
+      {label && <label className="text-small">{label} <span className="text-red-main text-small">*</span></label>}
 
       <select
         {...(isControlled ? { value, onChange } : register(name))}

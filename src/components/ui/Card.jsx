@@ -1,14 +1,40 @@
 import Button from "./Button";
+
 export default function CardVariant({
   thumbnail,
   title,
   description,
   duration,
+  createdAt,
   onEdit,
   onDelete,
   variant = "blog",
 }) {
   const isVideo = variant === "video";
+
+  const formattedDate = (() => {
+  if (!createdAt) return null;
+
+  const date = new Date(createdAt);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const isSameDay = (d1, d2) =>
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear();
+
+  if (isSameDay(date, today)) return "Today";
+  if (isSameDay(date, yesterday)) return "Yesterday";
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+})();
+
 
   return (
     <div
@@ -50,25 +76,34 @@ export default function CardVariant({
         )}
       </div>
 
-      {/* TEXT */}
-     <div className="flex flex-col gap-2 px-1">
-  <h3 className="text-primary-main title-h4 line-clamp-1">
-    {title}
-  </h3>
+      {/* TEXT – MATCH SIZE EXACTLY */}
+      <div className="flex flex-col  px-1 min-h-[60px]">
+        <h3 className="text-primary-main title-h4 line-clamp-1">
+          {title}
+        </h3>
 
-  <p className="text-secondary body-default line-clamp-2">
-    {description}
-  </p>
-</div>
+        <p className="text-secondary body-default line-clamp-2">
+          {description}
+        </p>
 
-        <div className="flex justify-end gap-s8">
-          <Button variant="primary" onClick={onEdit}>
-            Edit
-          </Button>
-          <Button variant="destructive" onClick={onDelete}>
-            Delete
-          </Button>
-        </div>
+      </div>
+
+      {/* BUTTONS – DO NOT CHANGE HEIGHT */}
+      <div className="flex justify-between items-center gap-s8">
+        {formattedDate && (
+          <p className="text-large text-gray-500">
+            <span className="font-medium">{formattedDate}</span>
+          </p>
+        )}
+       <div className="flex gap-1">
+         <Button variant="primary" onClick={onEdit}>
+          Edit
+        </Button>
+        <Button variant="destructive" onClick={onDelete}>
+          Delete
+        </Button>
+       </div>
+      </div>
     </div>
   );
 }

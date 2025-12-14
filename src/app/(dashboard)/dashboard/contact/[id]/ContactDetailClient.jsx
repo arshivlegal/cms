@@ -72,12 +72,11 @@ export default function ContactDetailClient({ id }) {
   };
 
   if (!id) return <p className="p-5">Invalid ID</p>;
-  if (!contact) return <p className="p-5">Loading contact...</p>;
 
   const fields = [
-    { label: "Full Name", value: contact.fullName },
-    { label: "Email", value: contact.email },
-    { label: "Phone", value: contact.phone },
+    { label: "Full Name", value: contact?.fullName },
+    { label: "Email", value: contact?.email },
+    { label: "Phone", value: contact?.phone },
   ];
 
   const statusOptions = ["pending", "resolved"];
@@ -90,7 +89,7 @@ export default function ContactDetailClient({ id }) {
       onConfirm={handleDeleteConfirm}
       loading={deleting}
       title="Delete Contact"
-      message={`Are you sure you want to delete the contact from "${contact.fullName}"? This action cannot be undone.`}
+      message={`Are you sure you want to delete the contact from "${contact?.fullName}"? This action cannot be undone.`}
     />
 
     <div className="max-w-3xl mx-auto p-6">
@@ -112,7 +111,7 @@ export default function ContactDetailClient({ id }) {
       <div className="bg-background border border-border p-6 rounded-xl shadow-sm space-y-6">
 
         {/* Basic Fields */}
-        {fields.map(({ label, value }) => (
+        {fields?.map(({ label, value }) => (
           <div key={label}>
             <p className="body-large">{label}</p>
             <p className="text-secondary">{value}</p>
@@ -123,12 +122,12 @@ export default function ContactDetailClient({ id }) {
         <div>
           <p className="body-large mb-1">Status</p>
           <select
-            value={contact.status}
+            value={contact?.status}
             onChange={handleStatusChange}
             disabled={updating}
             className="border border-border rounded px-s8 py-s8 bg-secondary-light text-text-primary"
           >
-            {statusOptions.map((option) => (
+            {statusOptions?.map((option) => (
               <option key={option} value={option}>
                 {option.charAt(0).toUpperCase() + option.slice(1)}
               </option>
@@ -143,7 +142,7 @@ export default function ContactDetailClient({ id }) {
         {/* Message */}
         <div>
           <p className="body-large">Message</p>
-          <p className="whitespace-pre-line text-secondary">{contact.message}</p>
+          <p className="whitespace-pre-line text-secondary">{contact?.message}</p>
         </div>
 
         {/* Delete Button */}

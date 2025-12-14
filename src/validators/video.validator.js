@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const videoCreateSchema = z.object({
-  title: z.string().min(3),
+  title: z.string().min(3, "Title must be at least 3 characters"),
   platform: z.enum(["youtube", "instagram", "facebook", "linkedin", "twitter"]),
   redirectUrl: z.string().url(),
   description: z.string().optional(),

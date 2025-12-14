@@ -66,14 +66,7 @@ function SidebarContent({ pathname, onClick = () => {} }) {
 
   return (
     <div className="flex flex-col h-full">
-      
-      <div className="flex items-center justify-between bg-white px-s16 py-s16 border-b border-primary-light">
-        <h2 className="font-bold text-primary-main body-large mx-s64">
-          CMS Panel
-        </h2>
-      </div>
-
-      <nav className="flex flex-col gap-s8 p-s16 mt-s8 flex-1">
+      <nav className="flex flex-col gap-s8 p-s16 mt-20 flex-1 ">
         {links.map((link) => {
           const isActive = pathname === link.href;
           return (
@@ -88,13 +81,13 @@ function SidebarContent({ pathname, onClick = () => {} }) {
               }`}
             >
               {link.icon}
-              <span className="px-2 py-1">{link.name}</span>
+              <span className="px-s8 py-1">{link.name}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-s16 py-s16 border-t border-primary-light text-xs text-secondary-light">
+      <div className="px-s16 py-s16 border-t border-primary-light caption text-secondary-light">
         © {new Date().getFullYear()} Arshiv Legal CMS
       </div>
     </div>

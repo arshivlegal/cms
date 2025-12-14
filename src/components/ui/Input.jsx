@@ -12,6 +12,7 @@ export default function Input({
   value,
   onChange,
   onKeyDown,
+ 
   className = ""
 }) {
   // Check if this is a controlled input (not using react-hook-form)
@@ -19,7 +20,7 @@ export default function Input({
   
   return (
     <div className="flex flex-col gap-s8 w-full">
-      {label && <label className=" text-text-main  text-small">{label}</label>}
+      {label && <label className=" text-text-main  text-small">{label}<span className="text-red-main">*</span></label>}
       <input
         {...(isControlled ? {} : register(name))}
         type={type}

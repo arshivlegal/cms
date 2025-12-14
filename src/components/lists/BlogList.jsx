@@ -4,9 +4,9 @@ import axios from "axios";
 import Card from "@/components/ui/Card";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import Button from "../ui/Button";
+
 export default function BlogList() {
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
@@ -19,16 +19,12 @@ export default function BlogList() {
   });
   const [deleting, setDeleting] = useState(false);
 
-  const limit = 20;
+  const limit = 15;
 
-  // ✅ Fetch blogs
+  // Fetch blogs
   const fetchBlogs = async (pageNum = 1, append = false) => {
     try {
-      if (append) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
-      }
+      if (append) setLoadingMore(true);
 
       const res = await axios.get(`/api/blog?page=${pageNum}&limit=${limit}`);
 
@@ -53,27 +49,26 @@ export default function BlogList() {
       setError("Failed to load blogs. Please try again later.");
       if (!append) setBlogs([]);
     } finally {
-      setLoading(false);
       setLoadingMore(false);
     }
   };
 
-  // ✅ Load more handler
+  // Load more handler
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     fetchBlogs(nextPage, true);
   };
 
-  // ✅ Confirm delete
+  // Confirm delete
   const handleDelete = async () => {
     if (!deleteModal.id) return;
     try {
       setDeleting(true);
       await axios.delete(`/api/blog/${deleteModal.id}`);
+
       setDeleteModal({ open: false, id: null, title: "" });
-      
-      // Reset and reload from page 1
+
       setPage(1);
       fetchBlogs(1, false);
     } catch (err) {
@@ -84,33 +79,16 @@ export default function BlogList() {
     }
   };
 
-  // ✅ Load blogs on mount
+  // Load blogs on mount
   useEffect(() => {
     fetchBlogs(1, false);
   }, []);
 
-  // 🌀 Loading
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-lg">Loading blogs...</div>
-      </div>
-    );
-  }
+  // ❌ Removed loading UI completely — blogs will appear when loaded
 
-  // ❌ Error
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
-
-  // ✅ Render Grid + Modal
   return (
     <>
-      {/* 🧩 Delete Confirmation Popup */}
+      {/* Delete Confirmation Popup */}
       <ConfirmDeleteModal
         isOpen={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, id: null, title: "" })}
@@ -120,7 +98,12 @@ export default function BlogList() {
         message={`Are you sure you want to delete "${deleteModal.title}"? This action cannot be undone.`}
       />
 
-      {/* 📰 Blog Grid */}
+      {/* Error message */}
+      {error && (
+        <div className="text-center text-red-500 my-8">{error}</div>
+      )}
+
+      {/* Blog Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-s32 mx-auto">
         {blogs.map((b) => (
           <Card
@@ -128,6 +111,7 @@ export default function BlogList() {
             title={b.title}
             thumbnail={b.thumbnail}
             description={b.description}
+              createdAt={b.createdAt} 
             onEdit={() =>
               (window.location.href = `/dashboard/blog/edit/${b._id}`)
             }
@@ -142,20 +126,22 @@ export default function BlogList() {
         ))}
       </div>
 
-      {/* 🔽 Load More Button */}
-      {hasMore && (
-        <div className="flex justify-center mt-8">
-          <Button
-            onClick={handleLoadMore}
-            disabled={loadingMore}
-            varient={"ctaAcent"}
-          >
-            {loadingMore ? "Loading..." : `Load More (${blogs.length} of ${total})`}
-          </Button>
-        </div>
-      )}
+      {/* Load More Button */}
+   {/* Load More Button — only show when blogs exist */}
+{blogs.length > 0 && hasMore && (
+  <div className="flex justify-center mt-12 mb-12">
+    <Button
+      onClick={handleLoadMore}
+      disabled={loadingMore}
+      varient={"ctaAcent"}
+    >
+      {loadingMore ? "Loading..." : `Load More (${blogs.length} of ${total})`}
+    </Button>
+  </div>
+)}
 
-      {/* ✅ All loaded message */}
+
+      {/* All loaded message */}
       {!hasMore && blogs.length > 0 && (
         <div className="text-center mt-8 text-gray-500">
           All blogs loaded ({blogs.length} of {total})

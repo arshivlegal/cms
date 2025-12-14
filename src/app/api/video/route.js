@@ -129,7 +129,7 @@ export async function POST(req) {
 
     // Manual required check
     if (!title?.trim() || !thumbnail?.trim() || !platform?.trim() || !redirectUrl?.trim()) {
-      throw new ApiError(400, "All fields are required");
+      throw new ApiError(400, "All star fields are required");
     }
 if (!category) throw new ApiError(400, "Category is required");
 if (!Array.isArray(tags) || tags.length === 0) {

@@ -38,7 +38,7 @@ export default function DashboardPageClient() {
       <h1 className="page-title-h2">Dashboard Overview 📊</h1>
 
       <p className="body-default max-w-2xl text-secondary">
-        Track your blog, video & upload activities at a glance.
+        Track your blog, video & contacts  at a glance.
       </p>
 
       {/* Stats Grid */}

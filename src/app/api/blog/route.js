@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import connectToDB from "@/lib/dbConnect";
 import Blog from "@/models/blog.model";
@@ -109,7 +110,6 @@ export async function POST(req) {
     const validated = await validateBody(blogCreateSchema, body);
     if (validated instanceof NextResponse) return validated;
 
-    console.log("📥 VALIDATED BODY:", validated);
 
     const {
       title,

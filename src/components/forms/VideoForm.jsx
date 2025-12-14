@@ -5,18 +5,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { videoCreateSchema } from "@/validators/video.validator";
 import CardVariant from "@/components/ui/preview";
-
 import Input from "@/components/ui/Input";
 import FileInput from "@/components/ui/FileInput";
 import Select from "@/components/ui/Select";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
-
 import { uploadFile } from "@/utils/uploadFile";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export default function VideoForm({ onSuccess, initialData = null, isEditing = false }) {
+export default function VideoForm({ 
+  onSuccess, 
+  initialData = null, 
+  isEditing = false 
+}) {
   const router = useRouter();
 
   const {
@@ -25,6 +27,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
     setValue,
     reset,
     watch,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(videoCreateSchema),
@@ -41,19 +44,19 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
     },
   });
 
-  // Watch category + tags from form
-  const tags = watch("tags");
-  const category = watch("category");
-
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(initialData?.thumbnail || "");
   const [uploading, setUploading] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [formMessage, setFormMessage] = useState({ type: "", text: "" });
 
-  // ------------------------------------------------------
-  // Prefill on edit
-  // ------------------------------------------------------
+  // Watch form values
+  const watchedTitle = watch("title");
+  const watchedDescription = watch("description");
+  const watchedPlatform = watch("platform");
+  const watchedTags = watch("tags");
+
+  // Prefill form data on edit
   useEffect(() => {
     if (initialData) {
       reset({
@@ -70,11 +73,37 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
     }
   }, [initialData, reset]);
 
-  // ------------------------------------------------------
+  // Clear top error message when fields are filled
+  useEffect(() => {
+    if (formMessage.type === "error") {
+      if (watchedTags.length > 0 && formMessage.text.includes("tag")) {
+        setFormMessage({ type: "", text: "" });
+      }
+      if (previewUrl && formMessage.text.includes("Thumbnail")) {
+        setFormMessage({ type: "", text: "" });
+      }
+    }
+  }, [watchedTags, previewUrl, formMessage]);
+
+  // Auto-clear field errors when criteria is met
+  useEffect(() => {
+    if (errors.title && watchedTitle?.length >= 3) {
+      clearErrors("title");
+    }
+  }, [watchedTitle, errors.title]);
+
   // Submit Handler
-  // ------------------------------------------------------
   const onSubmit = async (data) => {
     setFormMessage({ type: "", text: "" });
+
+    // Validate thumbnail
+    if (!isEditing && !thumbnailFile && !previewUrl) {
+      setFormMessage({
+        type: "error",
+        text: "Thumbnail image is required.",
+      });
+      return;
+    }
 
     try {
       setUploading(true);
@@ -107,7 +136,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
         router.push("/dashboard/video");
       }, 800);
 
-      onSuccess && onSuccess();
+      if (onSuccess) onSuccess();
     } catch (err) {
       setFormMessage({
         type: "error",
@@ -121,9 +150,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
     }
   };
 
-  // ------------------------------------------------------
   // Category Options
-  // ------------------------------------------------------
   const categories = [
     "General",
     "Corporate Law",
@@ -147,48 +174,33 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
     { label: "Twitter", value: "twitter" },
   ];
 
-  // ------------------------------------------------------
   // Add Tags
-  // ------------------------------------------------------
   const addTag = (tag) => {
-    const trimmed = tag.trim();
+    const trimmed = tag.trim().replace(/,$/, "");
     if (!trimmed) return;
-    if (tags.includes(trimmed)) return;
+    if (watchedTags.includes(trimmed)) return;
 
-    const updated = [...tags, trimmed];
+    const updated = [...watchedTags, trimmed];
     setValue("tags", updated);
   };
 
   const removeTag = (i) => {
-    const updated = tags.filter((_, idx) => idx !== i);
+    const updated = watchedTags.filter((_, idx) => idx !== i);
     setValue("tags", updated);
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-s24 bg-white p-s24 rounded-r16 shadow"
+      className="flex flex-col gap-s24 bg-white p-s32 rounded-r16 shadow border border-text-secondary/10"
     >
-      {/* Feedback message */}
-      {formMessage.text && (
-        <div
-          className={`p-s16 rounded-r8 text-small ${
-            formMessage.type === "error"
-              ? "bg-red-main/10 text-red-main border border-red-main/30"
-              : "bg-green-100 text-green-800 border border-green-600"
-          }`}
-        >
-          {formMessage.text}
-        </div>
-      )}
-
       {/* Title */}
       <Input
-        label="Title *"
+        label="Video Title"
         name="title"
         register={register}
         error={errors.title}
-        placeholder="Video Title"
+        placeholder="Enter video title"
       />
 
       {/* Description */}
@@ -202,7 +214,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
 
       {/* Platform */}
       <Select
-        label="Platform *"
+        label="Platform"
         name="platform"
         register={register}
         options={platformOptions}
@@ -211,7 +223,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
 
       {/* Category */}
       <Select
-        label="Category *"
+        label="Category"
         name="category"
         register={register}
         options={categories.map((c) => ({ label: c, value: c }))}
@@ -220,7 +232,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
 
       {/* Redirect URL */}
       <Input
-        label="Redirect URL *"
+        label="Redirect URL"
         name="redirectUrl"
         register={register}
         error={errors.redirectUrl}
@@ -229,34 +241,35 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
 
       {/* Tags */}
       <div>
-        <label className="block text-default mb-s8">
+        <label className="text-default">
           Tags <span className="text-red-main">*</span>{" "}
-          <span className="text-sm text-gray-500">(Press Enter or comma)</span>
+          <span className="body-small">(Press Enter or comma)</span>
         </label>
 
-        <input
-          type="text"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === ",") {
-              e.preventDefault();
-              addTag(tagInput);
-              setTagInput("");
-            }
-          }}
-          placeholder="e.g. civil-law"
-          className="w-full px-s16 py-s16 border border-gray-300 rounded-r8 focus:outline-none focus:border-accent-main"
-        />
+        <div className="flex gap-s8 mt-s8">
+          <Input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === ",") {
+                e.preventDefault();
+                addTag(tagInput);
+                setTagInput("");
+              }
+            }}
+            placeholder="e.g. civil-law"
+          />
+        </div>
 
         {errors.tags && (
-          <p className="text-red-main text-sm mt-1">{errors.tags.message}</p>
+          <p className="text-red-main body-small p-1">{errors.tags.message}</p>
         )}
 
         {/* Tag List */}
-        {tags.length > 0 && (
+        {watchedTags.length > 0 && (
           <div className="flex flex-wrap gap-s8 mt-s8">
-            {tags.map((tag, i) => (
+            {watchedTags.map((tag, i) => (
               <span
                 key={i}
                 className="inline-flex items-center gap-2 px-s16 py-s8 bg-secondary-main text-primary-main rounded-full"
@@ -265,7 +278,7 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
                 <button
                   type="button"
                   onClick={() => removeTag(i)}
-                  className="text-red-main hover:text-red-700 font-bold"
+                  className="text-red-main hover:text-red-700 body-default"
                 >
                   ×
                 </button>
@@ -275,41 +288,27 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
         )}
       </div>
 
-      {/* Thumbnail */}
- {/* Thumbnail Upload */}
-<FileInput
-  label="Thumbnail Image *"
-  onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setThumbnailFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  }}
-  fileName={thumbnailFile?.name}
-  accept="image/*"
-/>
+      {/* Thumbnail Upload */}
+      <FileInput
+        label="Thumbnail Image"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setThumbnailFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+          }
+        }}
+        fileName={thumbnailFile?.name}
+        accept="image/*"
+      />
 
-{/* LIVE PREVIEW */}
-{(previewUrl || watch("title") || watch("description")) && (
-  <div className="flex justify-center mt-s16">
-    <CardVariant
-      image={previewUrl || "/placeholder.jpg"}
-      title={watch("title") || "Video Title Preview"}
-      description={watch("description") || "Video description preview..."}
-      variant={watch("platform") || "video"}
-    />
-  </div>
-)}
-
-
-
+      {/* Thumbnail Preview */}
       {previewUrl && (
-        <div className="relative w-48 h-32 mt-s8">
+        <div className="relative w-48 h-32 mt-s8 group">
           <img
             src={previewUrl}
             alt="Thumbnail Preview"
-            className="w-full h-full object-cover rounded-r8 border"
+            className="w-full h-full object-cover rounded-r8 border group-hover:opacity-70 transition"
           />
           <button
             type="button"
@@ -317,15 +316,44 @@ export default function VideoForm({ onSuccess, initialData = null, isEditing = f
               setThumbnailFile(null);
               setPreviewUrl("");
             }}
-            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-red-700"
+            className="absolute -top-2 -right-2 bg-red-700 text-white rounded-full px-s8 shadow group-hover:scale-110 transition-transform hover:bg-red-800"
           >
             ✕
           </button>
         </div>
       )}
 
+      {/* Live Card Preview */}
+      {(previewUrl || watchedTitle || watchedDescription) && (
+        <div className="flex justify-center mt-s24">
+          <CardVariant
+            image={previewUrl || "/placeholder.jpg"}
+            title={watchedTitle || "Video Title Preview"}
+            description={watchedDescription || "Video description preview..."}
+            variant={watchedPlatform || "video"}
+          />
+        </div>
+      )}
+
+      {/* Feedback message - Above Submit Button */}
+      {formMessage.text && (
+        <div
+          className={`p-s16 rounded-r8 text-small ${
+            formMessage.type === "error"
+              ? "bg-red-main/10 text-red-main border border-red-main/20"
+              : "bg-green-100 text-primary-main border border-primary-main/20"
+          }`}
+        >
+          {formMessage.text}
+        </div>
+      )}
+
       {/* Submit Button */}
-      <Button type="submit" isLoading={isSubmitting || uploading} className="w-full">
+      <Button 
+        type="submit" 
+        isLoading={isSubmitting || uploading}
+        disabled={isSubmitting || uploading}
+      >
         {isSubmitting || uploading
           ? isEditing
             ? "Updating..."

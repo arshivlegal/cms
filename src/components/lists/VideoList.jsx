@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "@/components/ui/Card";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
-
+import Button from "../ui/Button";
 export default function VideoList() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ export default function VideoList() {
   });
   const [deleting, setDeleting] = useState(false);
 
-  const limit = 10;
+  const limit = 15;
 
   // 📡 Fetch videos
   const fetchVideos = async (pageNum = 1, append = false) => {
@@ -86,22 +86,6 @@ export default function VideoList() {
     fetchVideos(1, false);
   }, []);
 
-  // 🕓 Loading state
-  if (loading) {
-    return (
-      <p className="text-center text-secondary mt-s32">Loading videos...</p>
-    );
-  }
-
-  // 🪣 Empty state
-  if (!Array.isArray(videos) || videos.length === 0) {
-    return (
-      <p className="text-center text-secondary mt-s32">
-        No videos found.
-      </p>
-    );
-  }
-
   // 🎬 Render grid + modal
   return (
     <>
@@ -124,6 +108,8 @@ export default function VideoList() {
             subtitle={v.platform}
             thumbnail={v.thumbnail}
             description={v.description}
+              createdAt={v.createdAt} 
+              variant={"video"}
             onEdit={() =>
               (window.location.href = `/dashboard/video/edit/${v._id}`)
             }
@@ -139,17 +125,19 @@ export default function VideoList() {
       </div>
 
       {/* 🔽 Load More Button */}
-      {hasMore && (
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={handleLoadMore}
-            disabled={loadingMore}
-            className="px-6 py-3 bg-accent-main text-white rounded-lg hover:bg-accent-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loadingMore ? "Loading..." : `Load More (${videos.length} of ${total})`}
-          </button>
-        </div>
-      )}
+{/* Load More Button — only show when blogs exist */}
+{videos.length > 0 && hasMore && (
+  <div className="flex justify-center mt-12 mb-12">
+    <Button
+      onClick={handleLoadMore}
+      disabled={loadingMore}
+      varient={"ctaAcent"}
+    >
+      {loadingMore ? "Loading..." : `Load More (${videos.length} of ${total})`}
+    </Button>
+  </div>
+)}
+
 
       {/* ✅ All loaded message */}
       {!hasMore && videos.length > 0 && (

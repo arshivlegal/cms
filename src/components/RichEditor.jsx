@@ -16,10 +16,10 @@ export default function RichEditor({ value, onChange }) {
   // Only update editor content when value changes externally (not from user input)
   useEffect(() => {
     if (!editorRef.current || isUserTyping.current) return;
-    
+
     // Only update if the value is different from what's in the editor
     const currentContent = editorRef.current.getContent();
-    
+
     if (value !== currentContent && value !== lastValueRef.current) {
       lastValueRef.current = value;
       editorRef.current.setContent(value || "");
@@ -29,12 +29,12 @@ export default function RichEditor({ value, onChange }) {
   const handleEditorChange = (content, editor) => {
     isUserTyping.current = true;
     lastValueRef.current = content;
-    
+
     // Call onChange with the new content
     if (onChange) {
       onChange(content);
     }
-    
+
     // Reset typing flag after a short delay
     setTimeout(() => {
       isUserTyping.current = false;
@@ -52,7 +52,7 @@ export default function RichEditor({ value, onChange }) {
   return (
     <Editor
       apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
-      
+
       onInit={(evt, editor) => {
         editorRef.current = editor;
         lastValueRef.current = value;
@@ -171,19 +171,19 @@ export default function RichEditor({ value, onChange }) {
   }
 `,
 
-        
+
         // Prevent auto-clearing
         forced_root_block: 'p',
         remove_trailing_brs: false,
-        
+
         // Better paste handling
         paste_as_text: false,
         paste_data_images: true,
-        
+
         // Improve stability
         branding: false,
         promotion: false,
-        
+
         // Better typing experience
         browser_spellcheck: true,
         contextmenu: false,
