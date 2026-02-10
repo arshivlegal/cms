@@ -57,6 +57,7 @@ export async function GET(req) {
       content: 1,
       category: 1,
       tags: 1,
+      slug: 1, 
       thumbnail: 1,
       type: 1,
       duration: 1,

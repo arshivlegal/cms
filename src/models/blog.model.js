@@ -1,3 +1,4 @@
+import slugify from "slugify";
 import mongoose from "mongoose";
 
 const BlogSchema = new mongoose.Schema(
@@ -12,6 +13,11 @@ const BlogSchema = new mongoose.Schema(
       type: String,
       index: true, // FAST prefix search index!
     },
+slug: {
+  type: String,
+  unique: true,
+  index: true,
+},
 
     content: { type: String, required: true },
     thumbnail: { type: String, default: "" },
@@ -25,10 +31,26 @@ const BlogSchema = new mongoose.Schema(
 );
 
 // Auto-create lower-case search field
-BlogSchema.pre("save", function (next) {
-  if (this.title) {
-    this.searchTitle = this.title.toLowerCase();
+
+BlogSchema.pre("save", async function (next) {
+  if (!this.isModified("title")) return next();
+
+  this.searchTitle = this.title.toLowerCase();
+
+  let baseSlug = slugify(this.title, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
+
+  let slug = baseSlug;
+  let count = 1;
+
+  while (await mongoose.models.Blog.findOne({ slug })) {
+    slug = `${baseSlug}-${count++}`;
   }
+
+  this.slug = slug;
   next();
 });
 
