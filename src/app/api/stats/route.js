@@ -7,7 +7,7 @@ import Contact from "@/models/contact.model"
 export async function GET() {
   try {
     await connectToDB();
-
+//blog
     const blogCount = await Blog.countDocuments();
     const videoCount = await Video.countDocuments();
     const contactsCount = await Contact.countDocuments();
